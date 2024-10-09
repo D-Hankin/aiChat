@@ -91,45 +91,7 @@ public class ChatService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate audio response", e);
         } 
-    }     
-
-    // public ResponseEntity<byte[]> sendAudioResponse(ChatBot bot) {
-    //     String text = bot.getPrompt();
-    
-    //     var openAiAudioApi = new OpenAiAudioApi(apiKey);
-    //     var openAiAudioSpeechModel = new OpenAiAudioSpeechModel(openAiAudioApi);
-    
-    //     var speechOptions = OpenAiAudioSpeechOptions.builder()
-    //         .withResponseFormat(OpenAiAudioApi.SpeechRequest.AudioResponseFormat.MP3)
-    //         .withSpeed(1.0f)
-    //         .withModel(OpenAiAudioApi.TtsModel.TTS_1.value)
-    //         .build();
-    
-    //     var speechPrompt = new SpeechPrompt(text, speechOptions);
-    
-    //     System.out.println("Speech Prompt: " + speechPrompt.getText());
-    //     System.out.println("Speech Options: " + speechOptions);
-    
-    //     try {
-    //         SpeechResponse response = openAiAudioSpeechModel.call(speechPrompt);
-    //         System.out.println("Received audio response: " + response);
-    
-    //         if (response == null || response.getResult() == null) {
-    //             throw new RuntimeException("Received empty audio response from the API");
-    //         }
-    
-    //         byte[] audio = response.getResult().getOutput();
-    
-    //         return ResponseEntity.ok()
-    //             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"response.mp3\"")
-    //             .contentType(MediaType.APPLICATION_OCTET_STREAM)
-    //             .contentLength(audio.length)
-    //             .body(audio);
-    //     } catch (Exception e) {
-    //         throw new RuntimeException("Failed to generate audio response", e);
-    //     }
-    // }
-    
+    }         
 
     private RestTemplate getAudioRestTemplate() {
         RestTemplate audioRestTemplate = new RestTemplate(restTemplate.getRequestFactory());
