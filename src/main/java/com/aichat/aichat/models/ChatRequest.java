@@ -9,10 +9,10 @@ public class ChatRequest {
     private List<Message> messages;
     private int n;
     
-    public ChatRequest(String model, String prompt, int n) {
+    public ChatRequest(String model, String persona, String prompt, int n) {
         this.model = model;
         this.messages = new ArrayList<>();
-        this.messages.add(new Message("system", "you are a combination of Bill Hicks and George Carlin."));
+        this.messages.add(new Message("system", persona));
         this.messages.add(new Message("user", prompt));
         this.n = n;
     }
