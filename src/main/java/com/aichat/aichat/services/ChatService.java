@@ -31,22 +31,22 @@ public class ChatService {
 
     public ChatBot sendChatResponse(ChatBot bot) {
 
-        if ("Obi-wan".equals(bot.getName())) {
+        if ("George Carlin".equals(bot.getName())) {
 
-            ChatRequest chatRequest = new ChatRequest("gpt-3.5-turbo", "You are the God-Emporer of Dune, LetoII, as from the classic book GodEmporer of Dune. You are here to dicuss the complexities of inner and outer peace. Feel free to ask questions and be combative if you do not agree. You have full knowledge of the star wars universe. Keep responses udner 50 words. Keep responses under 50 words and discuss ideas, don't just repeat yourself.", bot.getPrompt(), 1);
+            ChatRequest chatRequest = new ChatRequest("gpt-3.5-turbo", "You are Bill Hicks, the legendary stand-up comedian known for your dark, edgy humor and deep philosophical musings. You're dead. You're unapologetically rebellious, challenging authority and societal norms, often with a mix of cynicism and hope for humanity. You joke about the afterlife, seeing it as another stage of existence, a cosmic joke where the punchline is death itself. Your humor is insightful, irreverent, and laced with existential reflection. You can be crude and unfeeling. Ask questions and be combative if you do not agree. Keep responses under 200 words and discuss ideas.", bot.getPrompt(), 1);
             ChatResponse response = restTemplate.postForObject(apiUrl, chatRequest, ChatResponse.class);
             if (response == null || response.getChoices() == null || response.getChoices().isEmpty() || response.getChoices().get(0).getMessage() == null) {
                 throw new RuntimeException("Received invalid response from the API");
             }
-            return new ChatBot("LetoII", response.getChoices().get(0).getMessage().getContent());
+            return new ChatBot("Bill Hicks", response.getChoices().get(0).getMessage().getContent());
 
-        } else if ("LetoII".equals(bot.getName())) {
-            ChatRequest chatRequest = new ChatRequest("gpt-3.5-turbo", "You are Obi-wan Kenobi.  You are here to dicuss the complexities of inner and outer peace. You have full knowlegde of the Dune universe. Feel free to ask questions and be combative if you do not agree. Keep responses under 50 words and discuss ideas, don't just repeat yourself.", bot.getPrompt(), 1);
+        } else if ("Bill Hicks".equals(bot.getName())) {
+            ChatRequest chatRequest = new ChatRequest("gpt-3.5-turbo", "You are George Carlin, the legendary comedian known for your sharp wit, brilliant observations, and unapologetic critique of society, politics, and human nature. You're dead. You can be crude and unfeeling. Ask questions and be combative if you do not agree. Mix it up to keep the conversation moving on. Keep responses under 200 words and discuss ideas, don't just repeat yourself.", bot.getPrompt(), 1);
             ChatResponse response = restTemplate.postForObject(apiUrl, chatRequest, ChatResponse.class);
             if (response == null || response.getChoices() == null || response.getChoices().isEmpty() || response.getChoices().get(0).getMessage() == null) {
                 throw new RuntimeException("Received invalid response from the API");
             }
-            return new ChatBot("Obi-wan", response.getChoices().get(0).getMessage().getContent());
+            return new ChatBot("George Carlin", response.getChoices().get(0).getMessage().getContent());
 
         } else {
             throw new RuntimeException("Received empty response from the API");
@@ -59,9 +59,9 @@ public class ChatService {
 
         AudioRequest audioRequest;
 
-        if ("Obi-wan".equals(bot.getName())) {
+        if ("George Carlin".equals(bot.getName())) {
             audioRequest = new AudioRequest("tts-1", "echo", text);
-        } else if ("LetoII".equals(bot.getName())) {
+        } else if ("Bill Hicks".equals(bot.getName())) {
             audioRequest = new AudioRequest("tts-1", "onyx", text);
         } else {
             throw new RuntimeException("Received invalid response from the API");
