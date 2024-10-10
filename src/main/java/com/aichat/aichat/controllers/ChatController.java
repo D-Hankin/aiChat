@@ -62,5 +62,21 @@ public class ChatController {
         
         return new ResponseEntity<MultiValueMap<Object, Object>>(body, headers, HttpStatus.OK);
     }
+
+    @PostMapping("/whisper")
+    public ResponseEntity<byte[]> sendToWhipser(@RequestBody byte[] audioData) {
+        System.out.println("Received voice message: " + audioData.length + " bytes");
+
+        try {
+            String transcription = chatService.getTranscription(audioData);
+            String textResponse = chatService.getResponse(transcription);
+            byte[] audioResponse = chatService.getAudioResponse(textResponse);
+            
+            return ResponseEntity.ok().body(audioResponse);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to process voice message", e);
+        }
+    }
     
-}   
+    
+}       

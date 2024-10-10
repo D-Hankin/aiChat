@@ -1,18 +1,20 @@
 package com.aichat.aichat.services;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.aichat.aichat.models.AudioRequest;
 import com.aichat.aichat.models.ChatBot;
 import com.aichat.aichat.models.ChatRequest;
 import com.aichat.aichat.models.ChatResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class ChatService {
@@ -22,6 +24,9 @@ public class ChatService {
 
     @Value("${open.api.tts.url}")
     String apiTTSUrl;
+
+    @Value("${open.api.whisper.url}")
+    String apiWhisperUrl;
 
     private final RestTemplate restTemplate;
 
@@ -65,27 +70,10 @@ public class ChatService {
             audioRequest = new AudioRequest("tts-1", "onyx", text);
         } else {
             throw new RuntimeException("Received invalid response from the API");
-        }
-
-        System.out.println("audioRequest model: " + audioRequest.getModel());
-        System.out.println("audioRequest input: " + audioRequest.getInput());
-        System.out.println("audioRequest voice: " + audioRequest.getVoice());
-        System.out.println("audio url: " + apiTTSUrl);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonPayload = "";
-        try {
-            jsonPayload = objectMapper.writeValueAsString(audioRequest);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        System.out.println("JSON Payload: " + jsonPayload);
+        }        
 
         try {
-            System.out.println("Sending request to: " + apiTTSUrl);
-            System.out.println("Request body: " + jsonPayload);
             byte[] response = restTemplate.postForObject(apiTTSUrl, audioRequest, byte[].class);
-            System.out.println("Received audio response: " + response);
     
             if (response == null || response == null) {
                 throw new RuntimeException("Received empty audio response from the API");
@@ -98,5 +86,39 @@ public class ChatService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate audio response", e);
         } 
-    }         
+    }
+
+    
+    public String getTranscription(byte[] audioData) {
+
+        ByteArrayResource resource = new ByteArrayResource(audioData) {
+            @Override
+            public String getFilename() {
+                return "audio.mp3";
+            }
+        };
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", resource);
+        body.add("model", "whisper-1");
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body);
+
+        return restTemplate.postForObject(apiWhisperUrl, requestEntity, String.class); 
+    } 
+
+    public String getResponse(String transcription) {
+        ChatRequest chatRequest = new ChatRequest("gpt-3.5-turbo", "You are the Devil himself.", transcription, 1);
+        ChatResponse response = restTemplate.postForObject(apiUrl, chatRequest, ChatResponse.class);
+        if (response == null || response.getChoices() == null || response.getChoices().isEmpty() || response.getChoices().get(0).getMessage() == null) {
+            throw new RuntimeException("Received invalid response from the API");
+        }
+        return response.getChoices().get(0).getMessage().getContent();  
+    }
+
+    public byte[] getAudioResponse(String response) {
+
+        AudioRequest audioRequest = new AudioRequest("tts-1", "onyx", response);
+        return restTemplate.postForObject(apiTTSUrl, audioRequest, byte[].class);
+    }
 }
